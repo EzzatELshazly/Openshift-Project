@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-app2
+  namespace: ezzatelshazly
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: app2
+  template:
+    metadata:
+      labels:
+        app: app2
+    spec:
+      containers:
+        - name: container
+          image: 'image-registry.openshift-image-registry.svc:5000/openshift/httpd'
+          ports:
+            - containerPort: 8080
+          env: []
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+    
+          resources:  
+            limits:
+              cpu: "0.5"   
+              memory: "512Mi"  
+            requests:
+              cpu: "0.1"   
+              memory: "128Mi"     
+          volumeMounts:
+            - name: storage-volume 
+              mountPath: /var/www/html
+
+ 
+      volumes:
+        - name: storage-volume
+          persistentVolumeClaim:
+            claimName: sample-app2-pvc
